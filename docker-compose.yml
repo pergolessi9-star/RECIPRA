@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: recipra
+      POSTGRES_PASSWORD: recipra
+      POSTGRES_DB: recipra
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U recipra -d recipra"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
