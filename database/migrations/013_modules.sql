@@ -1,0 +1,7 @@
+BEGIN;
+CREATE TABLE module.modules (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), module_key text NOT NULL UNIQUE, publisher text NOT NULL, name text NOT NULL);
+CREATE TABLE module.versions (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), module_id uuid NOT NULL REFERENCES module.modules(id) ON DELETE CASCADE, version text NOT NULL, manifest jsonb NOT NULL, checksum text NOT NULL, UNIQUE(module_id,version));
+CREATE TABLE module.installations (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL REFERENCES tenant.tenants(id) ON DELETE CASCADE, module_version_id uuid NOT NULL REFERENCES module.versions(id), status core.record_status NOT NULL DEFAULT 'ACTIVE', installed_at timestamptz NOT NULL DEFAULT now(), UNIQUE(tenant_id,module_version_id));
+CREATE TABLE module.entitlements (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL REFERENCES tenant.tenants(id) ON DELETE CASCADE, module_id uuid NOT NULL REFERENCES module.modules(id), feature_key text NOT NULL, enabled boolean NOT NULL DEFAULT true, limits jsonb NOT NULL DEFAULT '{}'::jsonb, UNIQUE(tenant_id,module_id,feature_key));
+CREATE TABLE module.usage_records (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL REFERENCES tenant.tenants(id) ON DELETE CASCADE, module_id uuid NOT NULL REFERENCES module.modules(id), metric text NOT NULL, quantity numeric(20,8) NOT NULL CHECK(quantity>=0), occurred_at timestamptz NOT NULL DEFAULT now());
+COMMIT;
