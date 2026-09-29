@@ -1,0 +1,1 @@
+{"name":"recipra","private":true,"version":"0.1.0","packageManager":"pnpm@10.17.1","scripts":{"dev":"pnpm --filter @recipra/api dev","build":"pnpm -r build","typecheck":"pnpm -r typecheck","test":"pnpm -r test"},"engines":{"node":">=22"}}
