@@ -1,0 +1,6 @@
+BEGIN;
+CREATE TABLE evidence.objects (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL REFERENCES tenant.tenants(id) ON DELETE CASCADE, evidence_type text NOT NULL, subject_type text NOT NULL, subject_id uuid, uri text, sha256 text, metadata jsonb NOT NULL DEFAULT '{}'::jsonb, created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE evidence.provenance_records (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL REFERENCES tenant.tenants(id) ON DELETE CASCADE, evidence_id uuid NOT NULL REFERENCES evidence.objects(id) ON DELETE CASCADE, source_type text NOT NULL, source_ref text, transformation jsonb NOT NULL DEFAULT '{}'::jsonb, parent_id uuid REFERENCES evidence.provenance_records(id), created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE evidence.verification_receipts (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL REFERENCES tenant.tenants(id) ON DELETE CASCADE, subject_type text NOT NULL, subject_id uuid NOT NULL, evidence_id uuid REFERENCES evidence.objects(id), integrity_status text NOT NULL, receipt jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
+ALTER TABLE governance.control_evidence ADD CONSTRAINT fk_control_evidence_object FOREIGN KEY(evidence_id) REFERENCES evidence.objects(id) ON DELETE CASCADE;
+COMMIT;
