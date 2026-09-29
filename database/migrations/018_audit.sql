@@ -1,0 +1,4 @@
+BEGIN;
+CREATE TABLE audit.events (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid REFERENCES tenant.tenants(id), actor_type text NOT NULL, actor_id text, action text NOT NULL, subject_type text, subject_id uuid, correlation_id uuid, causation_id uuid, before_state jsonb, after_state jsonb, occurred_at timestamptz NOT NULL DEFAULT now(), metadata jsonb NOT NULL DEFAULT '{}'::jsonb);
+CREATE TABLE core.outbox_events (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid REFERENCES tenant.tenants(id), event_type text NOT NULL, event_version integer NOT NULL DEFAULT 1 CHECK(event_version>0), aggregate_type text NOT NULL, aggregate_id uuid NOT NULL, correlation_id uuid NOT NULL, causation_id uuid, payload jsonb NOT NULL, occurred_at timestamptz NOT NULL DEFAULT now(), published_at timestamptz, attempts integer NOT NULL DEFAULT 0 CHECK(attempts>=0));
+COMMIT;
