@@ -1,0 +1,13 @@
+-- Integration invariants (run against disposable DB with app role).
+-- I1 duplicate provider conversion external_id must fail.
+-- I2 duplicate payment idempotency key must fail.
+-- I3 self-referral must fail.
+-- I4 negative ledger entry must fail.
+-- I5 posting unbalanced ledger transaction must fail.
+-- I6 editing/deleting entries after POSTED must fail.
+-- I7 POSTED transaction cannot return to DRAFT; reversal required.
+-- I8 cross-tenant reads/writes must be denied by RLS.
+-- I9 duplicate raw webhook provider/external_event_id must fail.
+-- I10 one payout execution per payout request.
+-- I11 wallet has no mutable balance column.
+-- I12 domain hostname is globally unique.
