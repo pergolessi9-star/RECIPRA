@@ -1,0 +1,4 @@
+BEGIN;
+CREATE OR REPLACE FUNCTION core.current_tenant_id() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT nullif(current_setting('app.tenant_id', true),'')::uuid $$;
+DO $$ DECLARE r record; BEGIN FOR r IN SELECT n.nspname s,c.relname t FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace JOIN pg_attribute a ON a.attrelid=c.oid AND a.attname='tenant_id' WHERE c.relkind='r' AND n.nspname IN ('tenant','core','affiliate','tracking','referral','ledger','payment','module','privacy','governance','ai','evidence','audit') LOOP EXECUTE format('ALTER TABLE %I.%I ENABLE ROW LEVEL SECURITY',r.s,r.t); EXECUTE format('ALTER TABLE %I.%I FORCE ROW LEVEL SECURITY',r.s,r.t); EXECUTE format('DROP POLICY IF EXISTS tenant_isolation ON %I.%I',r.s,r.t); EXECUTE format('CREATE POLICY tenant_isolation ON %I.%I USING (tenant_id = core.current_tenant_id()) WITH CHECK (tenant_id = core.current_tenant_id())',r.s,r.t); END LOOP; END $$;
+COMMIT;
