@@ -1,0 +1,1 @@
+{"name":"@recipra/adapters","version":"0.2.0","type":"module","exports":"./src/index.ts","dependencies":{"@recipra/auth":"workspace:*","@recipra/payments":"workspace:*"}}
