@@ -1,0 +1,6 @@
+BEGIN;
+CREATE TABLE IF NOT EXISTS audit.idempotency_keys(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),tenant_id uuid NOT NULL REFERENCES tenant.tenants(id) ON DELETE CASCADE,scope text NOT NULL,key text NOT NULL,response_code integer,response_body jsonb,created_at timestamptz NOT NULL DEFAULT now(),expires_at timestamptz,UNIQUE(tenant_id,scope,key));
+ALTER TABLE audit.idempotency_keys ENABLE ROW LEVEL SECURITY;ALTER TABLE audit.idempotency_keys FORCE ROW LEVEL SECURITY;CREATE POLICY tenant_isolation ON audit.idempotency_keys USING(tenant_id=core.current_tenant_id()) WITH CHECK(tenant_id=core.current_tenant_id());
+CREATE TABLE IF NOT EXISTS payment.provider_events(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),tenant_id uuid NOT NULL REFERENCES tenant.tenants(id) ON DELETE CASCADE,provider_id uuid NOT NULL REFERENCES core.providers(id),external_event_id text NOT NULL,event_type text NOT NULL,signature_valid boolean NOT NULL DEFAULT false,payload_sha256 text NOT NULL,received_at timestamptz NOT NULL DEFAULT now(),processed_at timestamptz,UNIQUE(provider_id,external_event_id));
+ALTER TABLE payment.provider_events ENABLE ROW LEVEL SECURITY;ALTER TABLE payment.provider_events FORCE ROW LEVEL SECURITY;CREATE POLICY tenant_isolation ON payment.provider_events USING(tenant_id=core.current_tenant_id()) WITH CHECK(tenant_id=core.current_tenant_id());
+COMMIT;
