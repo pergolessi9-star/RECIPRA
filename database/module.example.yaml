@@ -1,0 +1,20 @@
+id: recipra.surveys.pro
+version: 1.0.0
+requires:
+  core: ">=1.0"
+permissions: [offers.read, conversion.create, ledger.reward.request]
+subscribes: [conversion.verified.v1]
+emits: [survey.completed.v1]
+database:
+  migrations: true
+ui:
+  admin: true
+  member: true
+metering:
+  metric: verified_conversion
+compliance:
+  personal_data: true
+  profiling: false
+  ai_system: false
+rollback:
+  supported: true
