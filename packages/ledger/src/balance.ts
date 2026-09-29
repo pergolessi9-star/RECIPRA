@@ -1,0 +1,1 @@
+import type pg from "pg";export async function accountBalance(c:pg.PoolClient,accountId:string){const r=await c.query("SELECT coalesce(sum(CASE e.side WHEN 'CREDIT' THEN e.amount ELSE -e.amount END),0)::text balance FROM ledger.entries e JOIN ledger.transactions t ON t.id=e.transaction_id WHERE e.account_id=$1 AND t.status='POSTED'",[accountId]);return String(r.rows[0].balance)}
