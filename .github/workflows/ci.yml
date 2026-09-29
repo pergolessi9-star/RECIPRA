@@ -17,3 +17,32 @@ jobs:
           node-version: 22
       - run: pnpm install --no-frozen-lockfile
       - run: pnpm typecheck
+
+  database:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: recipra
+          POSTGRES_PASSWORD: recipra
+          POSTGRES_DB: recipra
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U recipra -d recipra"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGPASSWORD: recipra
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply every migration in lexical order
+        run: |
+          for file in database/migrations/*.sql; do
+            echo "Applying $file"
+            psql -h localhost -U recipra -d recipra -v ON_ERROR_STOP=1 -f "$file"
+          done
+      - name: Run invariant verification
+        run: psql -h localhost -U recipra -d recipra -v ON_ERROR_STOP=1 -f database/migrations/024_verification_tests.sql
