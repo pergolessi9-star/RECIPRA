@@ -1,0 +1,6 @@
+BEGIN;
+CREATE TABLE privacy.purposes (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL REFERENCES tenant.tenants(id) ON DELETE CASCADE, code text NOT NULL, description text NOT NULL, legal_basis text NOT NULL, retention_days integer CHECK(retention_days IS NULL OR retention_days>=0), UNIQUE(tenant_id,code));
+CREATE TABLE privacy.consents (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL REFERENCES tenant.tenants(id) ON DELETE CASCADE, user_id uuid NOT NULL REFERENCES identity.users(id), purpose_id uuid NOT NULL REFERENCES privacy.purposes(id), granted boolean NOT NULL, policy_version text NOT NULL, occurred_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE privacy.requests (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL REFERENCES tenant.tenants(id) ON DELETE CASCADE, user_id uuid REFERENCES identity.users(id), request_type text NOT NULL, status text NOT NULL, due_at timestamptz, created_at timestamptz NOT NULL DEFAULT now(), completed_at timestamptz);
+CREATE TABLE privacy.processors (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL REFERENCES tenant.tenants(id) ON DELETE CASCADE, provider_id uuid REFERENCES core.providers(id), purpose text NOT NULL, dpa_ref text, transfer_mechanism text, active boolean NOT NULL DEFAULT true);
+COMMIT;
