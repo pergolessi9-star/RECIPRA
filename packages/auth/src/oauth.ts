@@ -1,0 +1,1 @@
+import {createHash,randomBytes} from "node:crypto";export const hashToken=(v:string)=>createHash("sha256").update(v).digest("hex");export function newOAuthState(){const raw=randomBytes(32).toString("base64url");return{raw,hash:hashToken(raw)}}export function newSessionToken(){const raw=randomBytes(32).toString("base64url");return{raw,hash:hashToken(raw)}}
